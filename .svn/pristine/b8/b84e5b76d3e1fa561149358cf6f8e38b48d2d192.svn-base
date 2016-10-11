@@ -1,0 +1,42 @@
+package com.vivebest.erp.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.vivebest.erp.entity.Transactions;
+import com.vivebest.erp.mapper.TransactionsMapper;
+import com.vivebest.erp.service.TransactionsService;
+
+@Service
+public class TransactionsServiceImpl implements TransactionsService {
+
+	@Autowired
+	private TransactionsMapper transactionsMapper;
+
+	/**
+	 * 向交易流水表插入数据
+	 * 
+	 * @param transactions
+	 */
+	@Override
+	public void InsertToTransactions(Transactions transactions) {
+		// TODO Auto-generated method stub
+		transactionsMapper.insertToTransactions(transactions);
+	}
+
+	/**
+	 * 获取所有的交易流水信息
+	 * 
+	 * @param transactions
+	 * @return
+	 */
+	@Override
+	public List<Transactions> selectAllTransactions(Transactions transactions) {
+		return transactionsMapper.selectAllTransactions(transactions);
+		// TODO Auto-generated method stub
+
+	}
+
+}

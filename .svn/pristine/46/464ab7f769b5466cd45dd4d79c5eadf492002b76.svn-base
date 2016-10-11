@@ -1,0 +1,416 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ include file="/commons/taglibs.jsp" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>修改客户信息</title>
+	 <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <!-- Bootstrap Styles-->
+    <link href="${ctx}/style/assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FontAwesome Styles-->
+    <link href="${ctx}/style/assets/css/font-awesome.css" rel="stylesheet" />
+    <!-- Morris Chart Styles-->
+    <link href="${ctx}/style/assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
+    <!-- Custom Styles-->
+    <link href="${ctx}/style/assets/css/custom-styles.css" rel="stylesheet" />
+    <!-- Google Fonts-->
+    <link href='http://fonts.useso.com/css?family=Open+Sans' rel='stylesheet' type='text/css' /> 
+     
+    <link rel="stylesheet" type="text/css" href="${ctx}/style/home_login/main.css" />
+	<link rel="stylesheet" type="text/css" href="${ctx}/style/home_login/style.css" />
+	<script src="${ctx}/style/assets/js/jquery-1.10.2.js"></script>
+	<script src="${ctx}/scripts/main.js"></script>
+     
+<script type="text/javascript">
+	window.onload=function(){
+		$.getScript('http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js', function(_result) {
+            if (remote_ip_info.ret == '1') {
+            var mess=remote_ip_info.province+"省"+remote_ip_info.city+"市";
+            document.getElementById("cusAddress").value=mess;
+                //alert(remote_ip_info.country + '<BR>省：' + remote_ip_info.province + '<BR>市：' + remote_ip_info.city + '<BR>区：' + remote_ip_info.district + '<BR>ISP：' + remote_ip_info.isp + '<BR>类型：' + remote_ip_info.type + '<BR>其他：' + remote_ip_info.desc);
+            } else {
+                alert('没有找到匹配的IP地址信息！');
+                //没有网络手动输入
+                document.getElementById("cusAddress").readOnly=false;
+            }
+        });
+	
+	}
+   
+	function check_phone()
+	{
+		var phone=$("#phone").val();
+		if(phone==""||phone.length==0)
+		{
+			document.getElementById("show_phone").innerHTML="<span style='color:red;'>手机不能为空</span>";
+		}
+		else if(isPhone(phone)){
+			//手机验证正确
+			$.ajax({
+ 					type:'POST',
+ 					data:{cusPhone:phone},
+ 					dataType:'json',
+ 					url:'${ctx}/customer/checkPhone.do',
+ 					error:function(date)
+ 					{
+ 						alert(date.status);
+ 					},
+ 					success:function (data)
+ 					{
+ 						if(data=="0")
+ 							{
+ 							alert("手机号不可用");
+ 							window.location.href='${ctx}/views/customer/update_customer.jsp';
+ 							}
+ 						else 
+ 						{
+ 							//alert("手机号可用！");
+ 						}
+ 					}
+ 				});
+		}
+		else
+		{
+			//手机格式不正确
+			document.getElementById("show_phone").innerHTML="<span style='color:red;'>手机格式不正确</span>";
+		}
+
+	}
+
+	function check_email()
+	{
+		var email=$("#email").val();
+		if(email==""||email.length==0)
+		{
+			document.getElementById("show_email").innerHTML="<span style='color:red;'>邮箱不能为空</span>";
+		}
+		else if(isEmail(email)){
+		    //验证email
+			$.ajax({
+ 					type:'POST',
+ 					data:{cusEmail:email},
+ 					dataType:'json',
+ 					url:'${ctx}/customer/checkEmail.do',
+ 					error:function(date)
+ 					{
+ 						alert(date.status);
+ 					},
+ 					success:function (data)
+ 					{
+ 						if(data=="0")
+ 							{
+ 							alert("邮箱不可用");
+ 							window.location.href='${ctx}/views/customer/update_customer.jsp';
+ 							}
+ 						else 
+ 						{
+ 							//alert("邮箱可用！");
+ 						}
+ 					}
+ 				});
+		}
+		else
+		{
+			//邮箱格式格式不正确
+			document.getElementById("show_email").innerHTML="<span style='color:red;'>邮箱格式不正确</span>";
+		}
+
+	}
+
+
+
+	//验证邮箱类型
+		function isEmail(strEmail) {
+			if (strEmail.search(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/) != -1)
+			return true;
+			else
+				return false;
+			}
+			
+			//校验手机号码
+			//手机号码验证
+		    function isPhone(value){
+		    	var isPhone = /^([0-9]{3,4}-)?[0-9]{7,8}$/;
+		        var isMob=/^((\+?86)|(\(\+86\)))?(13[012356789][0-9]{8}|15[012356789][0-9]{8}|18[02356789][0-9]{8}|147[0-9]{8}|1349[0-9]{7})$/;
+		        if(isMob.test(value)||isPhone.test(value)){
+		            return true;
+		        }
+		        else{
+		            return false;
+		        }
+		    }
+
+   </script>
+</head>
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default top-navbar" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">
+                
+                <strong><img alt="" src="${ctx}/images/logo_head.png" style="width:30px;height:30px;"/>VIVEBEST</strong></a>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                 <!--用jctl进行判断当前处理的客户的状态  -->
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                                             当前无客户业务<i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user" id="main_nav">
+                        <li><a class="cd-signin" href="#0"><i class="fa fa-user fa-fw"></i> Login</a>
+                        </li>
+                </ul>
+                
+              <!--  <nav class="main_nav">
+					<ul >
+						<li><a class="cd-signin" href="#0"><i class="fa fa-user fa-fw"></i> Losgin</a></li>
+					</ul>
+				</nav> -->
+               
+               
+                   <!--  <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                      当前进行业务客户	<i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul> -->
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+        </nav>
+        <!--/. NAV TOP  -->
+        <nav class="navbar-default navbar-side" role="navigation">
+		<div id="sideNav" href=""><i class="fa fa-caret-right"></i></div>
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+
+                    <li>
+                        <a  href="${ctx}/views/teller/home.jsp"><i class="fa fa-dashboard"></i>柜员信息中心</a>
+                    </li>
+                   <!--  <li>
+                        <a href="ui-elements.html"><i class="fa fa-desktop"></i>柜员管理<span class="fa arrow"></span></a>
+                        
+                         <ul class="nav nav-second-level">
+                            <li>
+                                <a href="#">柜员信息</a>
+                            </li>
+                            <li>
+                                <a href="#">新增柜员</a>
+                            </li>
+                             <li>
+                                <a href="#">柜员权限修改</a>
+                            </li>
+                        </ul>
+                        
+                        
+                    </li> -->
+					<li>
+                        <a class="active-menu" href="chart.html"><i class="fa fa-bar-chart-o"></i>客户管理<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="${ctx}/views/customer/base_customer.jsp">客户信息</a>
+                            </li>
+							<li>
+                                <a href="${ctx}/views/customer/show_customer_account.jsp">当前客户账号详情</a>
+                            </li>
+                            <li>
+                                <a href="${ctx}/views/customer/add_customer.jsp">新增客户</a>
+                            </li>
+                        </ul>
+                        
+                    </li>
+                   <!--  <li>
+                        <a href="tab-panel.html"><i class="fa fa-qrcode"></i>客户账号管理<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+							<li>
+                                <a href="#">查看账户信息</a>
+                            </li>
+                            <li>
+                                <a href="#">维护账户</a>
+                             </li>  
+                        </ul>
+                    </li> -->
+                    
+                    <li>
+                        <a href="#"><i class="fa fa-sitemap"></i>客户业务<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+							<li>
+                                <a href="#">开账户业务</a>
+                            </li>
+                            <li>
+                                <a href="#">金钱来往业务</a>
+                            </li>
+                            
+                            <!-- <li>
+                                <a href="#">存款业务</a>
+                            </li>
+                            <li>
+                                <a href="#">取款业务</a>
+                            </li>
+                            <li>
+                                <a href="#">转账业务</a>
+                            </li>
+                            <li>
+                                <a href="#">其他业务<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    <li>
+                                        <a href="#">查看交易记录</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">查看转账情况</a>
+                                    </li>
+                                </ul>
+                            </li> -->
+                        </ul>
+                    </li>
+                    <li>
+                    <a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                    </li>
+                   <!--  <li>
+                        <a href="table.html"><i class="fa fa-table"></i> Responsive Tables</a>
+                    </li>
+                    <li>
+                        <a href="form.html"><i class="fa fa-edit"></i> Forms </a>
+                    </li> -->
+                </ul>
+            </div>
+
+        </nav>
+        <!-- /. NAV SIDE  -->
+        <div id="page-wrapper" >
+            <div id="page-inner">
+			 <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-header">
+                            客户修改 <small>Registered Member</small>
+                    <a>${message }</a>
+                        </h1>
+                    </div>
+                </div> 
+                 <!-- /. ROW  -->
+              <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            基本信息
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                    <form action="${ctx}/customer/updateCustomer.do" role="from"  method="post">
+                                <div class="col-lg-6">
+                                      <!--   <div class="form-group">
+                                            <label>Text Input</label>
+                                            <input class="form-control">
+                                        </div> -->
+                                        <input type="hidden" name="cusId" value=${sessionScope.customer.cusId }>
+                                        <div class="form-group">
+                                            <label>用户名称/Name</label>
+                                            <input class="form-control" value=${sessionScope.customer.cusName } name="cusName">
+                                        </div>
+
+										<div class="form-group">
+                                            <label>身份证号/Identification</label>
+                                            <input class="form-control" value=${sessionScope.customer.cusIdCard }
+											name="cusIdCard">
+                                        </div>
+
+										<div class="form-group">
+                                            <label>住址/cusAddress</label>
+                                            <input class="form-control" value=${sessionScope.customer.cusAddress }
+											name="cusAddress">
+                                        </div>
+										<div class="form-group">
+										<label> 状态id:/cusState</label>
+                                         <input class="form-control" value=${sessionScope.customer.cusState }  name="cusState"></input>
+                                        </div>
+										
+										
+                                </div>
+                                <!-- /.col-lg-6 (nested) -->
+                                <div class="col-lg-6">
+                                    
+                                    <h4>登陆信息</h4>
+                                    	
+                                        <div class="form-group has-success">
+                                            <label class="control-label" for="inputSuccess">手机号/Phone</label>
+                                            <input type="text" class="form-control" id="phone" value=${sessionScope.customer.cusPhone } 
+											name="cusPhone" onblur="check_phone()">
+
+											  <div  id="show_phone"></div>
+
+
+                                        </div>
+                                        <div class="form-group has-success">
+                                            <label class="control-label" for="inputSuccess">邮箱/Email</label>
+                                            <input type="text" class="form-control" id="email" value=${sessionScope.customer.cusEmail }
+											name="cusEmail" onblur="check_email()">
+
+											<div  id="show_email"></div>
+
+		
+
+
+                                        </div>
+                                        <div class="form-group has-success">
+                                            <label class="control-label" for="inputSuccess">登陆密码/Password</label>
+                                            <input type="password" class="form-control" id="inputSuccess" value=${sessionScope.customer.cusPassword } maxlength="18"
+											name="cusPassword">
+                                        </div>
+										 <div class="form-group has-success">
+                                            <label class="control-label" for="inputSuccess">确认密码/Confirm Password</label>
+                                            <input type="password" class="form-control" id="inputSuccess" value=${sessionScope.customer.cusPassword } name="cusPassword_1" maxlength="18">
+                                        </div>
+                                   
+										<button type="submit" class="btn btn-primary">提交</button>
+                                        <button type="reset" class="btn btn-primary">重置 </button>
+                                </div>
+                                    </form>
+                                <!-- /.col-lg-6 (nested) -->
+                            </div>
+
+                            <!-- /.row (nested) -->
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+		
+			</div>
+             <!-- /. PAGE INNER  -->
+            </div>
+         <!-- /. PAGE WRAPPER  -->
+        </div>
+     <!-- /. WRAPPER  -->
+    <!-- JS Scripts-->
+    <!-- jQuery Js -->
+   <script src="${ctx}/style/assets/js/jquery-1.10.2.js"></script>
+      <!-- Bootstrap Js -->
+    <script src="${ctx}/style/assets/js/bootstrap.min.js"></script>
+    <!-- Metis Menu Js -->
+    <script src="${ctx}/style/assets/js/jquery.metisMenu.js"></script>
+      <!-- Custom Js -->
+    <script src="${ctx}/style/assets/js/custom-scripts.js"></script>
+    
+    
+   
+</body>
+</html>

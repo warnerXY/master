@@ -1,0 +1,132 @@
+package com.vivebest.erp.control;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.vivebest.erp.entity.Customer;
+import com.vivebest.erp.entity.Teller;
+import com.vivebest.erp.service.TellerService;
+import com.vivebest.erp.utils.MD5;
+
+
+
+@Controller
+@RequestMapping("/teller")
+public class TellerControl {
+	
+	@Autowired
+	private TellerService tellerService;
+	
+	@RequestMapping(value="addTeller",method=RequestMethod.POST)
+	public String registerTeller(Model model,HttpServletRequest req){
+		String tName=req.getParameter("tName");
+		String password=req.getParameter("tPassword");
+		Teller teller=new Teller();
+		teller.settName(tName);
+		teller.settPassword(password);
+		int autId=Integer.parseInt(req.getParameter("autId"));
+		teller.setAutId(autId);
+		teller.setDelete(false);
+		boolean ok=tellerService.insertTeller(teller);
+		System.out.println(teller);
+		if (ok) {
+			model.addAttribute("message", "注册成功");
+			return "toller/loginTeller";
+		}else{
+			model.addAttribute("message", "注册失败");
+			return "toller/registerTeller";
+		}
+}
+	
+	/**
+	 * 登陆时间
+	 * @param userName
+	 * @param password
+	 * @param httpSession
+	 * @return
+	 */
+	@RequestMapping(value="loginTeller",method=RequestMethod.POST)
+	@ResponseBody
+	public String loginTeller(@RequestParam String userName,@RequestParam String password,HttpSession httpSession)
+	{
+		Teller teller=new Teller();
+		teller.settName(userName);
+		teller.settPassword(MD5.encode(password.trim()));
+		Teller t=tellerService.tellerLogin(teller);
+		System.out.println(">>>>>>>>>>>>>>>>>>>>>"+t);
+		if(t!=null)
+		{
+			//不为空
+			//登陆成功
+			//判断柜员是否失效
+			if(t.getIsDelete())
+			{
+				//存在
+				System.out.println(">>>>>>>>>>>>>>登陆成功");
+				httpSession.setAttribute("teller", t);
+				//修改登陆时间
+				
+				t.settLoginTime(new Date());
+				tellerService.updateTeller(t);
+				System.out.println(">>>>>>>>>修改时间");
+				return "1";
+			}
+			else
+			{
+				//失效用户
+				System.out.println(">>>>>>>>>>>>>>失效用户");
+				return "-1";
+			}
+		}
+		else
+		{
+			//不存在
+			System.out.println(">>>>>>>>>>>>>>登陆失败");
+			return "0";
+		}
+	}
+	@RequestMapping(value="loginHome",method=RequestMethod.GET)
+	public String loginHome(HttpSession httpSession)
+	{
+		Teller teller=(Teller) httpSession.getAttribute("teller");
+		if(teller==null)
+		{
+			//用户失效重新登陆
+			return "teller/login";
+		}
+		else
+		{
+			//查询客户处理事件数，等待写
+			return "teller/home";
+		}
+	}
+
+	
+	//退出
+	@RequestMapping(value="loginOut",method=RequestMethod.GET)
+	public String loginOut(HttpSession httpSession)
+	{
+		Teller teller=(Teller) httpSession.getAttribute("teller");
+		if(teller==null)
+		{
+			//用户失效重新登陆
+			return "teller/login";
+		}
+		else
+		{
+			httpSession.removeAttribute("teller");
+			//查询客户处理事件数，等待写
+			return "teller/login";
+		}
+	}
+}

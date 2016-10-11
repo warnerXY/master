@@ -1,0 +1,21 @@
+package com.vivebest.erp.service;
+
+import java.util.List;
+
+import com.vivebest.erp.entity.Transactions;
+
+public interface TransactionsService {
+	
+	/**
+	 * 向交易流水表插入数据
+	 * @param transactions
+	 */
+	public void InsertToTransactions(Transactions transactions);
+	
+	/**
+	 * 获取所有的流水信息
+	 * @param transactions
+	 * @return
+	 */
+	public List<Transactions> selectAllTransactions(Transactions transactions);
+}

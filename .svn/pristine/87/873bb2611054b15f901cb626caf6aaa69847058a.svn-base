@@ -1,0 +1,27 @@
+package com.vivebest.erp.mapper;
+
+import java.util.List;
+
+import com.vivebest.erp.entity.Transactions;
+
+public interface TransactionsMapper {
+	
+	/**
+	 * 向流水表中添加记录
+	 * @param transactions
+	 */
+	public void insertToTransactions(Transactions transactions);
+	/**
+	 * 更新流水表
+	 * @param transactions
+	 */
+	public void updateTransactions(Transactions transactions);
+	
+	/**
+	 * 根据账户号查询所有的流水记录
+	 * @param transactions
+	 * @return
+	 */
+	public List<Transactions> selectAllTransactions(Transactions transactions);
+
+}
